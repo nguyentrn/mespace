@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { readFileSync } from "fs";
-import { MODELS } from "./MODELS.js";
+import { MODELS } from "./MODELS";
 
 export class AI {
   openai = new OpenAI({
@@ -23,6 +23,7 @@ export class AI {
   }) {
     this.model = MODELS[model];
     this.temperature = temperature;
+    console.log(systemInstructionPaths);
     this.systemInstructions = systemInstructionPaths.map(
       (systemInstructionPath: string) =>
         String(readFileSync(systemInstructionPath)),
@@ -48,15 +49,6 @@ export class AI {
       messages: this.createMessages(userInstructions),
       temperature: this.temperature,
     });
-    const response = completion.choices[0].message.content
-      ?.replace("```json", "")
-      .replace("```", "");
-    if (response) {
-      try {
-        return JSON.parse(response);
-      } catch (e) {
-        console.log(e);
-      }
-    }
+    return completion.choices[0].message.content;
   }
 }
